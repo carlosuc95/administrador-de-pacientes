@@ -1,25 +1,64 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react'
+import { Cita } from './components/Cita';
+import { Formulario } from './components/Formulario';
+import PropTypes from 'prop-types'
 
 function App() {
+
+  let citasIniciales = JSON.parse(localStorage.getItem('citas'));
+  if (!citasIniciales) {
+    citasIniciales = []
+  } 
+
+  const [citas, setCitas] = useState(citasIniciales);
+
+  useEffect(() => {
+    
+    localStorage.setItem('citas', JSON.stringify(citas));
+
+  }, [citas])
+
+  const crearCita = cita => {
+    setCitas([
+      ...citas,
+      cita
+    ])
+  }
+
+  const eliminarCita = (id) => {
+    setCitas(citas.filter( cita => cita.id !== id));
+  } 
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <h1>Administrador de Pacientes</h1>
+      
+      <div className="container">
+        <div className="row">
+          <div className="one-half column">
+            <Formulario
+              crearCita={crearCita}
+            />
+          </div>
+          <div className="one-half column">
+          { citas.length ? <h2>Administrar Citas</h2> : <h2>Agrega una Cita</h2>}
+            {citas.map( cita => (
+              <Cita
+              key={cita.id}
+              cita={cita}
+              eliminarCita={eliminarCita}
+              />
+            ))}
+
+          </div>
+        </div>
+      </div>
+    </>
   );
+}
+
+Formulario.prototype = {
+  crearCita: PropTypes.func.isRequired 
 }
 
 export default App;
